@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0c1b2f">
+    <meta name="description" content="Interpola mediciones de PM2.5 con splines cúbicos y analiza las alertas de calidad del aire.">
+    <title>SOMA | Calidad del aire, estación por estación</title>
+    <link rel="icon" type="image/png" href="./assets/soma-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./src/main.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="SOMA, calidad del aire">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="./assets/soma-logo.png" alt="">
+        </span>
+        <span class="brand-copy"><strong>SOMA</strong><small>CALIDAD DEL AIRE</small></span>
+      </a>
+      <div class="topbar-note"><span class="live-dot"></span> Laboratorio de análisis ambiental</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>ANÁLISIS NUMÉRICO</span><span class="eyebrow-line"></span><span>CASO 03</span></p>
+          <h1>El aire que respiras,<br><em>kilómetro a kilómetro.</em></h1>
+          <p class="hero-description">Convierte 10 mediciones de PM₂.₅ en un mapa continuo de exposición. Explora zonas críticas con interpolación cúbica y una banda de incertidumbre.</p>
+          <div class="hero-facts">
+            <div class="fact"><span class="fact-icon">01</span><span>10 estaciones<br><b>de monitoreo</b></span></div>
+            <span class="fact-divider"></span>
+            <div class="fact"><span class="fact-icon">02</span><span>9 km de<br><b>corredor urbano</b></span></div>
+            <span class="fact-divider"></span>
+            <div class="fact"><span class="fact-icon">03</span><span>91 puntos<br><b>de estimación</b></span></div>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-sun"></div>
+          <div class="art-hill art-hill-back"></div>
+          <div class="art-hill art-hill-front"></div>
+          <div class="art-road"></div>
+          <div class="art-pin pin-one"><span></span></div>
+          <div class="art-pin pin-two"><span></span></div>
+          <div class="art-pin pin-three"><span></span></div>
+          <div class="art-label">CORREDOR URBANO <b>0—9 km</b></div>
+          <div class="art-glow"></div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Análisis de mediciones">
+        <aside class="input-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">01 / TUS MEDICIONES</p>
+              <h2>Datos de las estaciones</h2>
+            </div>
+            <span class="required-badge">10 valores</span>
+          </div>
+          <p class="panel-intro">Ingresa la concentración registrada en cada estación. Las distancias están fijadas cada 1 km.</p>
+
+          <form id="measurement-form" novalidate>
+            <div class="table-head" aria-hidden="true"><span>ESTACIÓN</span><span>DISTANCIA</span><span>PM₂.₅ <small>µg/m³</small></span></div>
+            <div id="station-fields" class="station-fields"></div>
+            <div id="form-error" class="form-error" role="alert" hidden></div>
+            <div class="form-actions">
+              <button class="button button-primary" type="submit">
+                <span>Analizar mediciones</span>
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" /></svg>
+              </button>
+              <button class="button button-quiet" id="sample-button" type="button">Usar datos del caso <span aria-hidden="true">↗</span></button>
+            </div>
+            <p class="form-footnote"><span aria-hidden="true">⌁</span> Tus datos se procesan localmente en este navegador.</p>
+          </form>
+        </aside>
+
+        <section class="results-panel" aria-live="polite">
+          <div id="empty-state" class="empty-state">
+            <div class="empty-illustration" aria-hidden="true">
+              <div class="empty-grid"></div>
+              <svg viewBox="0 0 180 100"><path class="empty-area" d="M15 76 C40 68 45 39 68 48 S102 76 121 46 150 28 166 20 V91 H15Z" /><path class="empty-line" d="M15 76 C40 68 45 39 68 48 S102 76 121 46 150 28 166 20" /><circle cx="15" cy="76" r="3.5" /><circle cx="68" cy="48" r="3.5" /><circle cx="121" cy="46" r="3.5" /><circle cx="166" cy="20" r="3.5" /></svg>
+              <span class="empty-chip">91 puntos estimados</span>
+            </div>
+            <p class="section-kicker">02 / RESULTADOS</p>
+            <h2>Tu mapa de calidad del aire<br>empieza con los datos.</h2>
+            <p>Completa las 10 mediciones para generar la curva de exposición, validar el modelo y localizar las zonas de alerta.</p>
+            <div class="empty-steps"><span><b>1</b> Ingresa los datos</span><span><b>2</b> Calcula el modelo</span><span><b>3</b> Explora resultados</span></div>
+          </div>
+
+          <div id="analysis-results" hidden>
+            <div class="results-heading">
+              <div><p class="section-kicker">02 / RESULTADOS DEL CORREDOR</p><h2>Panorama de exposición</h2></div>
+              <span class="model-badge"><span></span> SPLINE CÚBICO NATURAL</span>
+            </div>
+            <p class="results-summary">Estimación espacial entre estaciones, con referencia comparativa y banda simulada de confianza al 95%.</p>
+
+            <div class="chart-card">
+              <div class="chart-toolbar">
+                <div><span class="chart-title">Concentración de PM₂.₅</span><span class="chart-unit">µg/m³</span></div>
+                <div class="chart-legend">
+                  <label><input id="toggle-spline" type="checkbox" checked><span class="legend-line spline-legend"></span> Spline</label>
+                  <label><input id="toggle-pchip" type="checkbox" checked><span class="legend-line pchip-legend"></span> PCHIP</label>
+                  <label><input id="toggle-band" type="checkbox" checked><span class="legend-band"></span> IC 95%</label>
+                </div>
+              </div>
+              <div id="chart-container" class="chart-container"></div>
+              <div class="chart-axis-caption"><span>Distancia sobre el corredor (km)</span><span class="chart-step">Malla de cálculo: 0.1 km</span></div>
+            </div>
+
+            <div class="metric-grid" id="metric-grid"></div>
+
+            <div class="detail-grid">
+              <section class="detail-card alert-card">
+                <div class="detail-heading"><div><p class="section-kicker">MAPA DE RIESGO</p><h3>Tramos de alerta</h3></div><span class="detail-icon alert-icon" aria-hidden="true">!</span></div>
+                <p class="detail-description">Clasificación según la concentración estimada en la spline.</p>
+                <div id="alert-ranges" class="alert-ranges"></div>
+                <p class="threshold-note"><span class="yellow-dot"></span> Amarilla ≥ 70 <span class="red-dot"></span> Roja ≥ 90 µg/m³</p>
+              </section>
+
+              <section class="detail-card validation-card">
+                <div class="detail-heading"><div><p class="section-kicker">VALIDACIÓN CRUZADA</p><h3>Leave-one-out</h3></div><span class="detail-icon validation-icon" aria-hidden="true">↗</span></div>
+                <p class="detail-description">Se excluye una por una cada estación interna y se predice su valor con las otras nueve.</p>
+                <div id="validation-summary" class="validation-summary"></div>
+                <p class="validation-footnote">8 nodos internos · extremos conservados</p>
+                <details class="validation-details">
+                  <summary>Ver errores por estación</summary>
+                  <div id="validation-table"></div>
+                </details>
+              </section>
+            </div>
+
+            <section class="data-card">
+              <div class="detail-heading"><div><p class="section-kicker">DATOS DE ENTRADA</p><h3>Estaciones del corredor</h3></div><span class="data-unit">PM₂.₅ · µg/m³</span></div>
+              <div id="measurement-summary" class="measurement-summary"></div>
+            </section>
+            <p class="method-note"><b>Sobre el método.</b> En cada intervalo, la spline se escribe como Sⱼ(x) = aⱼ + bⱼ(x − xⱼ) + cⱼ(x − xⱼ)² + dⱼ(x − xⱼ)³. Para la condición natural, c₀ = cₙ = 0; los cⱼ internos se obtienen del sistema tridiagonal hⱼ₋₁cⱼ₋₁ + 2(hⱼ₋₁ + hⱼ)cⱼ + hⱼcⱼ₊₁ = 3[(aⱼ₊₁ − aⱼ)/hⱼ − (aⱼ − aⱼ₋₁)/hⱼ₋₁]. Luego se calculan bⱼ y dⱼ con las fórmulas de la hoja. PCHIP se muestra como comparación. La banda se estima con 100 simulaciones Monte Carlo (σ = 2.5 µg/m³). La validación corresponde a los 8 nodos internos.</p>
+          </div>
+        </section>
+      </section>
+      <footer class="footer"><span>SOMA <span>·</span> Calidad del aire para comunidades más saludables</span><span>Datos de medición bajo tu control</span></footer>
+    </main>
+  </body>
+</html>
